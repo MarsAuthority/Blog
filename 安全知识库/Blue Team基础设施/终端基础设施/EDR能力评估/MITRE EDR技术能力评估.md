@@ -4,6 +4,7 @@ tags:
 - Blue Team基础设施
 - 终端基础设施
 - EDR能力评估
+- 能力评估
 - MITRE
 ---
 
