@@ -64,4 +64,4 @@ ChatGPT 的主要优点之一是它能够理解和响应自然语言输入。这
 
 - [ChatGPT提问的艺术 - 掘金 (juejin.cn)](https://juejin.cn/post/7204739332174102588)
 - [Awesome ChatGPT Prompts | This repo includes ChatGPT prompt curation to use ChatGPT better.](https://prompts.chat/)
-- [dair-ai/Prompt-Engineering-Guide: Guides, papers, lecture, and resources for prompt engineering (github.com)](
+- https://github.com/dair-ai/Prompt-Engineering-Guide
