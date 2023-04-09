@@ -121,5 +121,3 @@ print response.status
 
 -   LunaBot
     
-
-⌥E

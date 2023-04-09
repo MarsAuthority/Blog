@@ -140,5 +140,3 @@ N-gram在安全领域还有很多其他的应用，比如HIDS(通过系统调用
 2. [Anagram: A Content Anomaly Detector Resistant to Mimicry Attack](http://ids.cs.columbia.edu/sites/default/files/anagram-camera-fixed.pdf)
 3. [N-Grams tutorial](https://lagunita.stanford.edu/c4x/Engineering/CS-224N/asset/slp4.pdf)
 4. [N-Grams wikipedia](https://en.wikipedia.org/wiki/N-gram)
-
-⌥E

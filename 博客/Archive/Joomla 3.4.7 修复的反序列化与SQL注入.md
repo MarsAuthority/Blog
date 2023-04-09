@@ -204,5 +204,3 @@ $query->values(((int) $id) . ',' . $db->quote($this->associationsContext) . ',' 
 3. [http://bobao.360.cn/learning/detail/2501.html](http://bobao.360.cn/learning/detail/2501.html)
 4. [https://github.com/joomla/joomla-cms/commit/2cd4ef682f0cab6ff03200b79007a25f19c6690e](https://github.com/joomla/joomla-cms/commit/2cd4ef682f0cab6ff03200b79007a25f19c6690e)
 5. [https://www.joomla.org/announcements/release-news/5643-joomla-3-4-7.html](https://www.joomla.org/announcements/release-news/5643-joomla-3-4-7.html)
-
-⌥E

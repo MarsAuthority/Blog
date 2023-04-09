@@ -1,9 +1,9 @@
 ---
 title: 理解PHP内存管理
 tags:
-- 博客
-- PHP
-- 内存管理
+  - 博客
+  - PHP
+  - 内存管理
 ---
 
 ## 内存管理概述
@@ -681,5 +681,3 @@ PHP的内存管理实现了自己的内存池，使得PHP内核在真正使用�
 3. [http://www.phppan.com/php-source-analytics/](http://www.phppan.com/php-source-analytics/)
 4. [http://www.laruence.com/2011/11/09/2277.html](http://www.laruence.com/2011/11/09/2277.html)
 5. [https://github.com/php/php-src/blob/PHP-5.4/Zend/zend_alloc.c](https://github.com/php/php-src/blob/PHP-5.4/Zend/zend_alloc.c)
-
-⌥E

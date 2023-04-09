@@ -189,5 +189,3 @@ struct _zend_op {
 3. [http://rancoud.com/read-phps-opcode/](http://rancoud.com/read-phps-opcode/)
 4. [http://www.php-internals.com/book/?p=chapt02/02-03-02-opcode](http://www.php-internals.com/book/?p=chapt02/02-03-02-opcode)
 5. [http://security.tencent.com/index.php/blog/msg/19](http://security.tencent.com/index.php/blog/msg/19)
-
-⌥E

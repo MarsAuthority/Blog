@@ -233,5 +233,3 @@ typedef unsigned long ulong;
 ## 分析
 
 现在再来看看这个php代码吧，前面的那个bug利用前提是数组的value相同，key不同，所以首先需要匹配一个md5出来，我在cmd5试了这10个md5，只有第五个`06e2b745f3124f7d670f78eabaa94809`能解出，原文是`hund`。于是首先写入cookie：`Cookie: user[0]=5;user[1]=hund;` 程序会进入58行，验证通过，$valid_user被改为true，这个时候输出为`Welcome back user`。到了这一步答案已经很接近了，只需要将$uid改为0即可。现在试试前面提到的漏洞，我们写入cookie：`Cookie: user[137438953472]=5;user[1]=hund;` 这个时候因为之前提到的漏洞，程序还是会进入58行，因为$input[0]未赋值，所以为NULL，在PHP中`0+NULL=0`,故成功将$uid改为0。
-
-⌥E
