@@ -6,7 +6,7 @@ tags:
   - 内存管理
 ---
 
-## 内存管理概述
+# 内存管理概述
 
 内存管理，是指软件运行时对计算机内存资源的分配和使用的技术。其最主要的目的是如何高效，快速的分配，并且在适当的时候释放和回收内存资源。
 
@@ -14,7 +14,7 @@ tags:
 
 介于以上原因，PHP实现了自己的内存管理器（ZendMM）, 所以在编写PHP脚本的时候我们不需要对内存进行管理。
 
-## ZendMM
+# ZendMM
 
 ```
 Zend Memory Manager
@@ -34,7 +34,7 @@ the Zend MM can be tweaked using ZEND_MM_MEM_TYPE and ZEND_MM_SEG_SIZE environme
 variables.  Default values are "malloc" and "256K". Dependent on target system you
 can also use "mmap_anon", "mmap_zero" and "win32" storage managers.
 
-	$ ZEND_MM_MEM_TYPE=mmap_anon ZEND_MM_SEG_SIZE=1M sapi/cli/php ..etc.
+  $ ZEND_MM_MEM_TYPE=mmap_anon ZEND_MM_SEG_SIZE=1M sapi/cli/php ..etc.
 ```
 
 借用一张图来说明一下：
@@ -69,7 +69,7 @@ void* pecalloc(size_t num, size_t count, zend_bool persistent);
 void  pefree(void* pointer, zend_bool persistent);
 ```
 
-## 存储层（storage）
+# 存储层（storage）
 
 存储层（storage）是向系统真正的申请内存，它的作用是将内存分配的方式对堆层透明化。我们先看看它的结构。
 
@@ -78,23 +78,23 @@ void  pefree(void* pointer, zend_bool persistent);
 typedef struct _zend_mm_storage zend_mm_storage;
 
 typedef struct _zend_mm_segment {
-	size_t	size;
-	struct _zend_mm_segment *next_segment;
+  size_t  size;
+  struct _zend_mm_segment *next_segment;
 } zend_mm_segment;
 
 typedef struct _zend_mm_mem_handlers {
-	const char *name;
-	zend_mm_storage* (*init)(void *params);
-	void (*dtor)(zend_mm_storage *storage);
-	void (*compact)(zend_mm_storage *storage);
-	zend_mm_segment* (*_alloc)(zend_mm_storage *storage, size_t size);
-	zend_mm_segment* (*_realloc)(zend_mm_storage *storage, zend_mm_segment *ptr, size_t size);
-	void (*_free)(zend_mm_storage *storage, zend_mm_segment *ptr);
+  const char *name;
+  zend_mm_storage* (*init)(void *params);
+  void (*dtor)(zend_mm_storage *storage);
+  void (*compact)(zend_mm_storage *storage);
+  zend_mm_segment* (*_alloc)(zend_mm_storage *storage, size_t size);
+  zend_mm_segment* (*_realloc)(zend_mm_storage *storage, zend_mm_segment *ptr, size_t size);
+  void (*_free)(zend_mm_storage *storage, zend_mm_segment *ptr);
 } zend_mm_mem_handlers;
 
 struct _zend_mm_storage {
-	const zend_mm_mem_handlers *handlers;
-	void *data;
+  const zend_mm_mem_handlers *handlers;
+  void *data;
 };
 ```
 
@@ -103,74 +103,74 @@ struct _zend_mm_storage {
 ```
 ZEND_API zend_mm_heap *zend_mm_startup(void)
 {
-	int i;
-	size_t seg_size;
-	char *mem_type = getenv("ZEND_MM_MEM_TYPE"); //内存分配方案
-	char *tmp;
-	const zend_mm_mem_handlers *handlers;
-	zend_mm_heap *heap;
+  int i;
+  size_t seg_size;
+  char *mem_type = getenv("ZEND_MM_MEM_TYPE"); //内存分配方案
+  char *tmp;
+  const zend_mm_mem_handlers *handlers;
+  zend_mm_heap *heap;
 
-	if (mem_type == NULL) { //默认使用malloc为分配方案，也就是0
-		i = 0;
-	} else {
-		for (i = 0; mem_handlers[i].name; i++) {
-			if (strcmp(mem_handlers[i].name, mem_type) == 0) { 
-				break;
-			}
-		}
-		if (!mem_handlers[i].name) {
-			fprintf(stderr, "Wrong or unsupported zend_mm storage type '%s'\n", mem_type);
-			fprintf(stderr, "  supported types:\n");
+  if (mem_type == NULL) { //默认使用malloc为分配方案，也就是0
+    i = 0;
+  } else {
+    for (i = 0; mem_handlers[i].name; i++) {
+      if (strcmp(mem_handlers[i].name, mem_type) == 0) { 
+        break;
+      }
+    }
+    if (!mem_handlers[i].name) {
+      fprintf(stderr, "Wrong or unsupported zend_mm storage type '%s'\n", mem_type);
+      fprintf(stderr, "  supported types:\n");
 /* See http://support.microsoft.com/kb/190351 */
 #ifdef PHP_WIN32
-			fflush(stderr);
+      fflush(stderr);
 #endif
-			for (i = 0; mem_handlers[i].name; i++) {
-				fprintf(stderr, "    '%s'\n", mem_handlers[i].name);
-			}
+      for (i = 0; mem_handlers[i].name; i++) {
+        fprintf(stderr, "    '%s'\n", mem_handlers[i].name);
+      }
 /* See http://support.microsoft.com/kb/190351 */
 #ifdef PHP_WIN32
-			fflush(stderr);
+      fflush(stderr);
 #endif
-			exit(255);
-		}
-	}
-	handlers = &mem_handlers[i];
-	//使用相应内存分配方案的handler，mem_handlers是结构体zend_mm_mem_handlers
+      exit(255);
+    }
+  }
+  handlers = &mem_handlers[i];
+  //使用相应内存分配方案的handler，mem_handlers是结构体zend_mm_mem_handlers
 
-	tmp = getenv("ZEND_MM_SEG_SIZE"); 
-	if (tmp) {
-		seg_size = zend_atoi(tmp, 0);
-		if (zend_mm_low_bit(seg_size) != zend_mm_high_bit(seg_size)) {
-			fprintf(stderr, "ZEND_MM_SEG_SIZE must be a power of two\n");
+  tmp = getenv("ZEND_MM_SEG_SIZE"); 
+  if (tmp) {
+    seg_size = zend_atoi(tmp, 0);
+    if (zend_mm_low_bit(seg_size) != zend_mm_high_bit(seg_size)) {
+      fprintf(stderr, "ZEND_MM_SEG_SIZE must be a power of two\n");
 /* See http://support.microsoft.com/kb/190351 */
 #ifdef PHP_WIN32
-			fflush(stderr);
+      fflush(stderr);
 #endif
-			exit(255);
-		} else if (seg_size < ZEND_MM_ALIGNED_SEGMENT_SIZE + ZEND_MM_ALIGNED_HEADER_SIZE) {
-			fprintf(stderr, "ZEND_MM_SEG_SIZE is too small\n");
+      exit(255);
+    } else if (seg_size < ZEND_MM_ALIGNED_SEGMENT_SIZE + ZEND_MM_ALIGNED_HEADER_SIZE) {
+      fprintf(stderr, "ZEND_MM_SEG_SIZE is too small\n");
 /* See http://support.microsoft.com/kb/190351 */
 #ifdef PHP_WIN32
-			fflush(stderr);
+      fflush(stderr);
 #endif
-			exit(255);
-		}
-	} else {
-		seg_size = ZEND_MM_SEG_SIZE; //段分配大小，未指定的话默认为ZEND_MM_SEG_SIZE，即(256 * 1024)
-	}
+      exit(255);
+    }
+  } else {
+    seg_size = ZEND_MM_SEG_SIZE; //段分配大小，未指定的话默认为ZEND_MM_SEG_SIZE，即(256 * 1024)
+  }
 
-	heap = zend_mm_startup_ex(handlers, seg_size, ZEND_MM_RESERVE_SIZE, 0, NULL);
-	//初始化heap
-	if (heap) {
-		tmp = getenv("ZEND_MM_COMPACT"); 
-		if (tmp) {
-			heap->compact_size = zend_atoi(tmp, 0);
-		} else {
-			heap->compact_size = 2 * 1024 * 1024;
-		}
-	}
-	return heap;
+  heap = zend_mm_startup_ex(handlers, seg_size, ZEND_MM_RESERVE_SIZE, 0, NULL);
+  //初始化heap
+  if (heap) {
+    tmp = getenv("ZEND_MM_COMPACT"); 
+    if (tmp) {
+      heap->compact_size = zend_atoi(tmp, 0);
+    } else {
+      heap->compact_size = 2 * 1024 * 1024;
+    }
+  }
+  return heap;
 }
 ```
 
@@ -178,7 +178,7 @@ ZEND_API zend_mm_heap *zend_mm_startup(void)
 
 ![4r26LI](https://cdn.jsdelivr.net/gh/MarsAuthority/sec_pic@master/uPic/2023-02/4r26LI.jpg)
 
-## 堆层（heap）
+# 堆层（heap）
 
 我们先看看heap的结构：
 
@@ -229,29 +229,29 @@ struct _zend_mm_heap {
 ```
 static inline void zend_mm_init(zend_mm_heap *heap)
 {
-	zend_mm_free_block* p;
-	int i;
+  zend_mm_free_block* p;
+  int i;
 
-	heap->free_bitmap = 0; //小块空闲内存标识
-	heap->large_free_bitmap = 0; //大块空闲内存标识
+  heap->free_bitmap = 0; //小块空闲内存标识
+  heap->large_free_bitmap = 0; //大块空闲内存标识
 #if ZEND_MM_CACHE
-	heap->cached = 0;
-	memset(heap->cache, 0, sizeof(heap->cache));
+  heap->cached = 0;
+  memset(heap->cache, 0, sizeof(heap->cache));
 #endif
 #if ZEND_MM_CACHE_STAT
-	for (i = 0; i < ZEND_MM_NUM_BUCKETS; i++) {
-		heap->cache_stat[i].count = 0;
-	}
+  for (i = 0; i < ZEND_MM_NUM_BUCKETS; i++) {
+    heap->cache_stat[i].count = 0;
+  }
 #endif
-	p = ZEND_MM_SMALL_FREE_BUCKET(heap, 0);
-	for (i = 0; i < ZEND_MM_NUM_BUCKETS; i++) {
-		p->next_free_block = p;
-		p->prev_free_block = p;
-		p = (zend_mm_free_block*)((char*)p + sizeof(zend_mm_free_block*) * 2);
-		heap->large_free_buckets[i] = NULL;
-	}
-	heap->rest_buckets[0] = heap->rest_buckets[1] = ZEND_MM_REST_BUCKET(heap);
-	heap->rest_count = 0;
+  p = ZEND_MM_SMALL_FREE_BUCKET(heap, 0);
+  for (i = 0; i < ZEND_MM_NUM_BUCKETS; i++) {
+    p->next_free_block = p;
+    p->prev_free_block = p;
+    p = (zend_mm_free_block*)((char*)p + sizeof(zend_mm_free_block*) * 2);
+    heap->large_free_buckets[i] = NULL;
+  }
+  heap->rest_buckets[0] = heap->rest_buckets[1] = ZEND_MM_REST_BUCKET(heap);
+  heap->rest_count = 0;
 }
 ```
 
@@ -265,9 +265,9 @@ free_buckets使用宏`ZEND_MM_SMALL_FREE_BUCKET`来管理分配小块内存：
 
 ```
 #define ZEND_MM_SMALL_FREE_BUCKET(heap, index) \
-	(zend_mm_free_block*) ((char*)&heap->free_buckets[index * 2] + \
-		sizeof(zend_mm_free_block*) * 2 - \
-		sizeof(zend_mm_small_free_block))
+  (zend_mm_free_block*) ((char*)&heap->free_buckets[index * 2] + \
+    sizeof(zend_mm_free_block*) * 2 - \
+    sizeof(zend_mm_small_free_block))
 ```
 
 free_buckets是一个数组指针，它存储的是指向zend_mm_free_block结构体的指针，他们以两个为一对，分别存储双向链表的头尾指针。如图：
@@ -278,30 +278,30 @@ free_buckets是一个数组指针，它存储的是指向zend_mm_free_block结�
 
 ```
 typedef struct _zend_mm_small_free_block {
-	zend_mm_block_info info;
+  zend_mm_block_info info;
 #if ZEND_DEBUG
-	unsigned int magic;
+  unsigned int magic;
 # ifdef ZTS
-	THREAD_T thread_id;
+  THREAD_T thread_id;
 # endif
 #endif
-	struct _zend_mm_free_block *prev_free_block;
-	struct _zend_mm_free_block *next_free_block;
+  struct _zend_mm_free_block *prev_free_block;
+  struct _zend_mm_free_block *next_free_block;
 } zend_mm_small_free_block;
 
 typedef struct _zend_mm_free_block {
-	zend_mm_block_info info;
+  zend_mm_block_info info;
 #if ZEND_DEBUG
-	unsigned int magic;
+  unsigned int magic;
 # ifdef ZTS
-	THREAD_T thread_id;
+  THREAD_T thread_id;
 # endif
 #endif
-	struct _zend_mm_free_block *prev_free_block;
-	struct _zend_mm_free_block *next_free_block;  
+  struct _zend_mm_free_block *prev_free_block;
+  struct _zend_mm_free_block *next_free_block;  
  
-	struct _zend_mm_free_block **parent;         
-	struct _zend_mm_free_block *child[2];         
+  struct _zend_mm_free_block **parent;         
+  struct _zend_mm_free_block *child[2];         
 } zend_mm_free_block;
 ```
 
@@ -332,7 +332,7 @@ so actually there is same ZEND_MM_NUMBER_BUCKET buckets stored in the free_bucke
 
 ![qgXzU4](https://cdn.jsdelivr.net/gh/MarsAuthority/sec_pic@master/uPic/2023-02/qgXzU4.jpg)
 
-# ****接口层（emalloc/efree）****
+# 接口层（emalloc/efree）
 
 PHP实现了emalloc、efree等函数，当程序需要内存的时候，ZendMM会在内存池中分配相应的内存，这样避免了PHP向系统频繁的内存申请操作，节省了系统开销。
 
@@ -376,15 +376,15 @@ best_fit = heap->cache[index];
 
 ```
 bitmap = heap->free_bitmap >> index;
-		if (bitmap) {
-			/* Found some "small" free block that can be used */
-			index += zend_mm_low_bit(bitmap);
-			best_fit = heap->free_buckets[index*2];
+    if (bitmap) {
+      /* Found some "small" free block that can be used */
+      index += zend_mm_low_bit(bitmap);
+      best_fit = heap->free_buckets[index*2];
 #if ZEND_MM_CACHE_STAT
-			heap->cache_stat[ZEND_MM_NUM_BUCKETS].hit++;
+      heap->cache_stat[ZEND_MM_NUM_BUCKETS].hit++;
 #endif
-			goto zend_mm_finished_searching_for_block;
-		}
+      goto zend_mm_finished_searching_for_block;
+    }
 ```
 
 **5.1：**首先看看free_buckets中剩余的内存是否满足true_size。（将heap->free_bitmap 右移index次，不为0则有空闲内存）
@@ -409,32 +409,32 @@ zend_mm_low_bit实现如下：
 static inline unsigned int zend_mm_low_bit(size_t _size)
 {
 #if defined(__GNUC__) && (defined(__native_client__) || defined(i386))
-	unsigned int n;
+  unsigned int n;
 
-	__asm__("bsfl %1,%0\n\t" : "=r" (n) : "rm"  (_size));
-	return n;
+  __asm__("bsfl %1,%0\n\t" : "=r" (n) : "rm"  (_size));
+  return n;
 #elif defined(__GNUC__) && defined(__x86_64__)
         unsigned long n;
 
         __asm__("bsf %1,%0\n\t" : "=r" (n) : "rm"  (_size));
         return (unsigned int)n;
 #elif defined(_MSC_VER) && defined(_M_IX86)
-	__asm {
-		bsf eax, _size
-	}
+  __asm {
+    bsf eax, _size
+  }
 #else
-	static const int offset[16] = {4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0};
-	unsigned int n;
-	unsigned int index = 0;
+  static const int offset[16] = {4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0};
+  unsigned int n;
+  unsigned int index = 0;
 
-	n = offset[_size & 15];
-	while (n == 4) {
-		_size >>= 4;
-		index += n;
-		n = offset[_size & 15];
-	}
+  n = offset[_size & 15];
+  while (n == 4) {
+    _size >>= 4;
+    index += n;
+    n = offset[_size & 15];
+  }
 
-	return index + n;
+  return index + n;
 #endif
 }
 ```
@@ -449,26 +449,26 @@ zend_mm_high_bit则为large_free_buckets的hash映射函数。
 static inline unsigned int zend_mm_high_bit(size_t _size)
 {
 #if defined(__GNUC__) && (defined(__native_client__) || defined(i386))
-	unsigned int n;
+  unsigned int n;
 
-	__asm__("bsrl %1,%0\n\t" : "=r" (n) : "rm"  (_size));
-	return n;
+  __asm__("bsrl %1,%0\n\t" : "=r" (n) : "rm"  (_size));
+  return n;
 #elif defined(__GNUC__) && defined(__x86_64__)
-	unsigned long n;
+  unsigned long n;
 
         __asm__("bsr %1,%0\n\t" : "=r" (n) : "rm"  (_size));
         return (unsigned int)n;
 #elif defined(_MSC_VER) && defined(_M_IX86)
-	__asm {
-		bsr eax, _size
-	}
+  __asm {
+    bsr eax, _size
+  }
 #else
-	unsigned int n = 0;
-	while (_size != 0) {
-		_size = _size >> 1;
-		n++;
-	}
-	return n-1;
+  unsigned int n = 0;
+  while (_size != 0) {
+    _size = _size >> 1;
+    n++;
+  }
+  return n-1;
 #endif
 }
 ```
@@ -495,7 +495,7 @@ size_t index = ZEND_MM_LARGE_BUCKET_INDEX(true_size);
 size_t bitmap = heap->large_free_bitmap >> index;
 
 if (bitmap == 0) {
-	return NULL;
+  return NULL;
 }
 ```
 
@@ -513,9 +513,9 @@ large_free_buckets是一种字典树，如果large_free_buckets[index]中的内�
 ```
 best_fit = p = heap->large_free_buckets[index + zend_mm_low_bit(bitmap)];
 while ((p = p->child[p->child[0] != NULL])) {
-	if (ZEND_MM_FREE_BLOCK_SIZE(p) < ZEND_MM_FREE_BLOCK_SIZE(best_fit)) {
-		best_fit = p;
-	}
+  if (ZEND_MM_FREE_BLOCK_SIZE(p) < ZEND_MM_FREE_BLOCK_SIZE(best_fit)) {
+    best_fit = p;
+  }
 }
 ```
 
@@ -525,8 +525,8 @@ while ((p = p->child[p->child[0] != NULL])) {
 
 ```
 if (!best_fit && heap->real_size >= heap->limit - heap->block_size) {
-	zend_mm_free_block *p = heap->rest_buckets[0];
-	size_t best_size = -1;
+  zend_mm_free_block *p = heap->rest_buckets[0];
+  size_t best_size = -1;
 ```
 
 **8：**如果以上都没有合适的内存的话（有可能是初始化的时候，或者内存不足的情况），申请一块段内存。
@@ -548,7 +548,7 @@ segment的结构如下图：
 
 ![0LGJRs](https://cdn.jsdelivr.net/gh/MarsAuthority/sec_pic@master/uPic/2023-02/0LGJRs.jpg)
 
-**9：**最后，将新的block放入large_free_buckets/free_buckets/rest_buckets。
+**9：** 最后，将新的block放入large_free_buckets/free_buckets/rest_buckets。
 
 ```
 zend_mm_free_block *new_free_block;
@@ -560,9 +560,9 @@ ZEND_MM_BLOCK(new_free_block, ZEND_MM_FREE_BLOCK, remaining_size);
 
 /* add the new free block to the free list */
 if (EXPECTED(!keep_rest)) {
-	zend_mm_add_to_free_list(heap, new_free_block);
+  zend_mm_add_to_free_list(heap, new_free_block);
 } else {
-	zend_mm_add_to_rest_list(heap, new_free_block);
+  zend_mm_add_to_rest_list(heap, new_free_block);
 }
 ```
 
@@ -573,34 +573,34 @@ index = ZEND_MM_LARGE_BUCKET_INDEX(size); //通过ZEND_MM_LARGE_BUCKET_INDEX定�
 p = &heap->large_free_buckets[index];
 mm_block->child[0] = mm_block->child[1] = NULL; 
 if (!*p) { //如果large_free_buckets[index]不存在，则直接写入。
-	*p = mm_block;
-	mm_block->parent = p;
-	mm_block->prev_free_block = mm_block->next_free_block = mm_block;
-	heap->large_free_bitmap |= (ZEND_MM_LONG_CONST(1) << index); //large_free_bitmap为可用大块内存大小
+  *p = mm_block;
+  mm_block->parent = p;
+  mm_block->prev_free_block = mm_block->next_free_block = mm_block;
+  heap->large_free_bitmap |= (ZEND_MM_LONG_CONST(1) << index); //large_free_bitmap为可用大块内存大小
 } else {
-	size_t m;
+  size_t m;
 
-	for (m = size << (ZEND_MM_NUM_BUCKETS - index); ; m <<= 1) {
-		zend_mm_free_block *prev = *p;
+  for (m = size << (ZEND_MM_NUM_BUCKETS - index); ; m <<= 1) {
+    zend_mm_free_block *prev = *p;
 
-		if (ZEND_MM_FREE_BLOCK_SIZE(prev) != size) { //block的大小和size的大小不一样时，存入使其成为best_fit
-			p = &prev->child[(m >> (ZEND_MM_NUM_BUCKETS-1)) & 1]; //这里的m是size先左移(ZEND_MM_NUM_BUCKETS - index)，后(ZEND_MM_NUM_BUCKETS-1))，说白了就是将size右移至剩余的高两位。 比如size为1024，则这里(m >> (ZEND_MM_NUM_BUCKETS-1))的结果是10 。如果最后一位为0，则将mm_block放入child[0]，最后一位是1，mm_block放入child[1]。相应地，在zend_mm_search_large_block中，使用m = true_size << (ZEND_MM_NUM_BUCKETS - index)，将size左移(32-size位数)位，最高位0，则取child[0]，最高位1，则取child[1]。
-			if (!*p) {
-				*p = mm_block;
-				mm_block->parent = p;
-				mm_block->prev_free_block = mm_block->next_free_block = mm_block;
-				break;
-			}
-		} else { //block的大小和size的大小一样时，之前存入zend_mm_block中，本质是一个双向链表。
-			zend_mm_free_block *next = prev->next_free_block;
+    if (ZEND_MM_FREE_BLOCK_SIZE(prev) != size) { //block的大小和size的大小不一样时，存入使其成为best_fit
+      p = &prev->child[(m >> (ZEND_MM_NUM_BUCKETS-1)) & 1]; //这里的m是size先左移(ZEND_MM_NUM_BUCKETS - index)，后(ZEND_MM_NUM_BUCKETS-1))，说白了就是将size右移至剩余的高两位。 比如size为1024，则这里(m >> (ZEND_MM_NUM_BUCKETS-1))的结果是10 。如果最后一位为0，则将mm_block放入child[0]，最后一位是1，mm_block放入child[1]。相应地，在zend_mm_search_large_block中，使用m = true_size << (ZEND_MM_NUM_BUCKETS - index)，将size左移(32-size位数)位，最高位0，则取child[0]，最高位1，则取child[1]。
+      if (!*p) {
+        *p = mm_block;
+        mm_block->parent = p;
+        mm_block->prev_free_block = mm_block->next_free_block = mm_block;
+        break;
+      }
+    } else { //block的大小和size的大小一样时，之前存入zend_mm_block中，本质是一个双向链表。
+      zend_mm_free_block *next = prev->next_free_block;
 
-			prev->next_free_block = next->prev_free_block = mm_block;
-			mm_block->next_free_block = next;
-			mm_block->prev_free_block = prev;
-			mm_block->parent = NULL;
-			break;
-		}
-	}
+      prev->next_free_block = next->prev_free_block = mm_block;
+      mm_block->next_free_block = next;
+      mm_block->prev_free_block = prev;
+      mm_block->parent = NULL;
+      break;
+    }
+  }
 }
 ```
 
@@ -614,7 +614,7 @@ large_free_buckets的结构如下图：
 
 ```
 if (!ZEND_MM_VALID_PTR(p)) {
-	return;
+  return;
 }
 
 HANDLE_BLOCK_INTERRUPTIONS();
@@ -628,20 +628,20 @@ ZEND_MM_CHECK_PROTECTION(mm_block);
 
 ```
 #if ZEND_MM_CACHE
-	if (EXPECTED(ZEND_MM_SMALL_SIZE(size)) && EXPECTED(heap->cached < ZEND_MM_CACHE_SIZE)) {
-		size_t index = ZEND_MM_BUCKET_INDEX(size); 
-		zend_mm_free_block **cache = &heap->cache[index];
+  if (EXPECTED(ZEND_MM_SMALL_SIZE(size)) && EXPECTED(heap->cached < ZEND_MM_CACHE_SIZE)) {
+    size_t index = ZEND_MM_BUCKET_INDEX(size); 
+    zend_mm_free_block **cache = &heap->cache[index];
 
-		((zend_mm_free_block*)mm_block)->prev_free_block = *cache;
-		*cache = (zend_mm_free_block*)mm_block;
-		heap->cached += size;
-		ZEND_MM_SET_MAGIC(mm_block, MEM_BLOCK_CACHED);
+    ((zend_mm_free_block*)mm_block)->prev_free_block = *cache;
+    *cache = (zend_mm_free_block*)mm_block;
+    heap->cached += size;
+    ZEND_MM_SET_MAGIC(mm_block, MEM_BLOCK_CACHED);
 #if ZEND_MM_CACHE_STAT
-		if (++heap->cache_stat[index].count > heap->cache_stat[index].max_count) {
-			heap->cache_stat[index].max_count = heap->cache_stat[index].count;
-		}
+    if (++heap->cache_stat[index].count > heap->cache_stat[index].max_count) {
+      heap->cache_stat[index].max_count = heap->cache_stat[index].count;
+    }
 #endif
-	}
+  }
 ```
 
 **3：**如果size是大块内存或者cache已满，且mm_block的前一块或者后一块block是空闲块，则调用zend_mm_remove_from_free_list将其删除（将下一个节点/上一节点合并）。如果mm_block为segment的第一块，则使用zend_mm_del_segment删除这个segment。否则就使用zend_mm_add_to_free_list将mm_block加入large_free_buckets/free_buckets/rest_buckets。
@@ -649,32 +649,32 @@ ZEND_MM_CHECK_PROTECTION(mm_block);
 ```
 next_block = ZEND_MM_BLOCK_AT(mm_block, size);
 if (ZEND_MM_IS_FREE_BLOCK(next_block)) {
-	zend_mm_remove_from_free_list(heap, (zend_mm_free_block *) next_block);
-	size += ZEND_MM_FREE_BLOCK_SIZE(next_block);
+  zend_mm_remove_from_free_list(heap, (zend_mm_free_block *) next_block);
+  size += ZEND_MM_FREE_BLOCK_SIZE(next_block);
 }
 if (ZEND_MM_PREV_BLOCK_IS_FREE(mm_block)) {
-	mm_block = ZEND_MM_PREV_BLOCK(mm_block);
-	zend_mm_remove_from_free_list(heap, (zend_mm_free_block *) mm_block);
-	size += ZEND_MM_FREE_BLOCK_SIZE(mm_block);
+  mm_block = ZEND_MM_PREV_BLOCK(mm_block);
+  zend_mm_remove_from_free_list(heap, (zend_mm_free_block *) mm_block);
+  size += ZEND_MM_FREE_BLOCK_SIZE(mm_block);
 }
 if (ZEND_MM_IS_FIRST_BLOCK(mm_block) &&
     ZEND_MM_IS_GUARD_BLOCK(ZEND_MM_BLOCK_AT(mm_block, size))) {
-	zend_mm_del_segment(heap, (zend_mm_segment *) ((char *)mm_block - ZEND_MM_ALIGNED_SEGMENT_SIZE));
+  zend_mm_del_segment(heap, (zend_mm_segment *) ((char *)mm_block - ZEND_MM_ALIGNED_SEGMENT_SIZE));
 } else {
-	ZEND_MM_BLOCK(mm_block, ZEND_MM_FREE_BLOCK, size);
-	zend_mm_add_to_free_list(heap, (zend_mm_free_block *) mm_block);
+  ZEND_MM_BLOCK(mm_block, ZEND_MM_FREE_BLOCK, size);
+  zend_mm_add_to_free_list(heap, (zend_mm_free_block *) mm_block);
 }
 ```
 
 其中zend_mm_remove_from_free_list也只是将large_free_buckets/free_buckets/rest_buckets中mm_block的相关指针销毁，将回收到内存池中。
 
-## 小结
+# 小结
 
 PHP的内存管理实现了自己的内存池，使得PHP内核在真正使用内存之前，先申请一块内存，当我们申请内存时就从内存池中分出一部分内存块，若内存块不够再继续申请新的内存，提高了内存分配的效率。PHP还实现了垃圾回收机制（Garbage Collection）及写时复制（Copy On Write）以进一步优化。
 
 以上文章仅仅是我个人(当然主要还是那些参考资料)的理解，有什么错误的地方还请指正。
 
-## 参考资料
+# 参考资料
 
 1. [http://www.kancloud.cn/kancloud/php-internals/42794](http://www.kancloud.cn/kancloud/php-internals/42794)
 2. [https://wiki.php.net/internals/zend_mm](https://wiki.php.net/internals/zend_mm)
