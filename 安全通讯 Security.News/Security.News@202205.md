@@ -1,6 +1,7 @@
 ---
 title: Security.News@202205
 tags:
+  - 安全通讯 Security.News
   - 供应链安全
   - 行业动态
   - 安全事件
