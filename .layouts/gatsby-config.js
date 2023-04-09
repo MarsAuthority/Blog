@@ -24,16 +24,16 @@ module.exports = {
         sidebarComponents: ["latest", "category", "tag"],
         nav: [
           {
-            title: "Github",
-            url: "https://github.com/theowenyoung/foam-template-gatsby-theme-primer-wiki/",
+            title: "RSS信息流",
+            url: "https://mars0run.notion.site/5ccdf71345c2440da2ccd385e98dd71d?v=edfc490b781d435ba1e066a4d1b2dd48",
           },
           {
-            title: "Twitter",
-            url: "https://twitter.com/theowenyoung",
+            title: "RedBlue",
+            url: "https://redblue.wiki/",
           },
         ],
         editUrl:
-          "https://github.com/theowenyoung/foam-template-gatsby-theme-primer-wiki/tree/main/",
+          "https://github.com/MarsAuthority/Blog/tree/main/",
       },
     },
     {
