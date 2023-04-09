@@ -1,10 +1,8 @@
 ---
-tags:
-  - Readme
-  - Getting-Started
+
 ---
 
-# Foam Template for Gatsby Theme Primer Wiki
+# 关于这个站点
 
 **👋Another Foam template that use [gatsby-theme-primer-wiki](https://github.com/theowenyoung/gatsby-theme-primer-wiki), Welcome to your new Foam Knowledge Base!**
 
