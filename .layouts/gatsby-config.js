@@ -3,7 +3,7 @@ const pathPrefix = "/";
 // Change me
 const siteMetadata = {
   title: "Mars’ Blog",
-  shortName: "记录·分享·回顾",
+  shortName: "Mars’ Blog | 记录·分享·回顾",
   description: "自我提升,效率提升,开源工具,学习笔记,网络安全",
   twitterName: "theowenyoung",
   imageUrl: "/graph-visualisation.jpg",

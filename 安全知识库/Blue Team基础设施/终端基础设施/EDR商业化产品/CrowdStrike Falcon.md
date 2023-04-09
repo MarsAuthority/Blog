@@ -3,7 +3,7 @@ title: CrowdStrike Falcon
 tags:
 - Blue Team基础设施
 - 终端基础设施
-- EDR
+- EDR商业化产品
 - CrowdStrike
 ---
 
