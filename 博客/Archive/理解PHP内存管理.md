@@ -16,7 +16,7 @@ tags:
 
 ## ZendMM
 
-```c
+```
 Zend Memory Manager
 ===================
 
@@ -29,7 +29,7 @@ allocation overhead and speedup memory management.
 
 PHP的内存管理是分层的，它分为三层：存储层（storage）、堆层（heap）和接口层（emalloc/efree）。存储层通过 malloc()、mmap() 等函数向系统真正的申请内存，并通过 free() 函数释放所申请的内存。存储层通常一次申请大量内存，这样接口层在需要分配空间的时候，通过堆层将存储层申请到的内存进行拆分，按照大小给接口层使用。在存储层共有4种内存分配方案: malloc，win32，mmap_anon，mmap_zero。默认使用malloc分配内存，如果设置了ZEND_WIN32宏，则为windows版本，调用HeapAlloc分配内存。并且PHP的内存方案可以通过设置变量来修改。
 
-```c
+```
 the Zend MM can be tweaked using ZEND_MM_MEM_TYPE and ZEND_MM_SEG_SIZE environment
 variables.  Default values are "malloc" and "256K". Dependent on target system you
 can also use "mmap_anon", "mmap_zero" and "win32" storage managers.
@@ -53,7 +53,7 @@ can also use "mmap_anon", "mmap_zero" and "win32" storage managers.
 
 ZendMM提供的request内存分配相关函数：
 
-```c
+```
 void*  emalloc(size_t size);
 void*  erealloc(void* pointer, size_t size);
 void*  ecalloc(size_t num, size_t count);
@@ -62,7 +62,7 @@ void   efree(void* pointer);
 
 ZendMM提供的persistent内存分配相关函数：
 
-```c
+```
 void* pemalloc(size_t size, zend_bool persistent);
 void* perealloc(void* pointer, size_t size, zend_bool persistent);
 void* pecalloc(size_t num, size_t count, zend_bool persistent);
@@ -73,7 +73,7 @@ void  pefree(void* pointer, zend_bool persistent);
 
 存储层（storage）是向系统真正的申请内存，它的作用是将内存分配的方式对堆层透明化。我们先看看它的结构。
 
-```c
+```
 /* Heaps with user defined storage */
 typedef struct _zend_mm_storage zend_mm_storage;
 
@@ -100,7 +100,7 @@ struct _zend_mm_storage {
 
 我们看看存储层（storage）的初始化函数zend_mm_startup():
 
-```c
+```
 ZEND_API zend_mm_heap *zend_mm_startup(void)
 {
 	int i;
@@ -182,7 +182,7 @@ ZEND_API zend_mm_heap *zend_mm_startup(void)
 
 我们先看看heap的结构：
 
-```c
+```
 struct _zend_mm_heap {
     int                 use_zend_alloc;
     void               *(*_malloc)(size_t);
@@ -226,7 +226,7 @@ struct _zend_mm_heap {
 
 之前的zend_mm_startup()函数调用zend_mm_startup_ex()来初始化堆层（heap），这里我们只说一下其中的zend_mm_init()，我们看看它的实现：
 
-```c
+```
 static inline void zend_mm_init(zend_mm_heap *heap)
 {
 	zend_mm_free_block* p;
@@ -263,7 +263,7 @@ static inline void zend_mm_init(zend_mm_heap *heap)
 
 free_buckets使用宏`ZEND_MM_SMALL_FREE_BUCKET`来管理分配小块内存：
 
-```c
+```
 #define ZEND_MM_SMALL_FREE_BUCKET(heap, index) \
 	(zend_mm_free_block*) ((char*)&heap->free_buckets[index * 2] + \
 		sizeof(zend_mm_free_block*) * 2 - \
@@ -276,7 +276,7 @@ free_buckets是一个数组指针，它存储的是指向zend_mm_free_block结�
 
 这里的初始化非常巧妙，我们先看看`ZEND_MM_SMALL_FREE_BUCKET`，它是将free_buckets列表的偶数位的内存地址(也就是指向prev_free_block的地址)加上两个指针的内存大小并减去zend_mm_small_free_block结构所占空间的大小。而因为zend_mm_free_block结构和zend_mm_small_free_block结构的差距在于两个指针，所以他的计算结果就是free_buckets列表index对应双向链表的第一个zend_mm_free_block的prev_free_block地址减8的地址。为什么是减8的地址？因为zend_mm_free_block的前8个字节是zend_mm_block_info，之后才是prev_free_block。两个结构体如下：
 
-```c
+```
 typedef struct _zend_mm_small_free_block {
 	zend_mm_block_info info;
 #if ZEND_DEBUG
@@ -311,7 +311,7 @@ typedef struct _zend_mm_free_block {
 
 接着后面的代码：
 
-```c
+```
 p = ZEND_MM_SMALL_FREE_BUCKET(heap, 0);
 for (i = 0; i < ZEND_MM_NUM_BUCKETS; i++) {
     p->next_free_block = p;
@@ -340,7 +340,7 @@ ZendMM在分配内存主要是有以下步骤：
 
 **1：** 计算出ture_size，即内存对齐。如果所需要的内存的大小的低三位不为0（不能为8整除），则将低三位加上7，并与~7进行按位与操作，即对于大小不是8的整数倍的内存大小补全到可以被8整除。
 
-```c
+```
 #define ZEND_MM_TRUE_SIZE(size)             ((size<ZEND_MM_MIN_SIZE)?(ZEND_MM_ALIGNED_MIN_HEADER_SIZE):(ZEND_MM_ALIGNED_SIZE(size+ZEND_MM_ALIGNED_HEADER_SIZE+END_MAGIC_SIZE)))
 ```
 
@@ -350,7 +350,7 @@ ZendMM在分配内存主要是有以下步骤：
 
 它的相关函数(即需要分配的内存大小对应的index)为：
 
-```c
+```
 #define ZEND_MM_BUCKET_INDEX(true_size) ((true_size>>ZEND_MM_ALIGNMENT_LOG2)-(ZEND_MM_ALIGNED_MIN_HEADER_SIZE>>ZEND_MM_ALIGNMENT_LOG2))
 ```
 
@@ -368,13 +368,13 @@ ZendMM在分配内存主要是有以下步骤：
 
 **4：** 如果Cache存在的话，即heap→cache[index]存在，则使用这片cache。（CACHE默认开启）
 
-```c
+```
 best_fit = heap->cache[index];
 ```
 
 **5：**如果未找到Cache，则从free_buckets查找是否存在空闲内存。
 
-```c
+```
 bitmap = heap->free_bitmap >> index;
 		if (bitmap) {
 			/* Found some "small" free block that can be used */
@@ -389,7 +389,7 @@ bitmap = heap->free_bitmap >> index;
 
 **5.1：**首先看看free_buckets中剩余的内存是否满足true_size。（将heap->free_bitmap 右移index次，不为0则有空闲内存）
 
-```c
+```
 bitmap = heap->free_bitmap >> index;
    if (bitmap) {
 }
@@ -397,7 +397,7 @@ bitmap = heap->free_bitmap >> index;
 
 **5.2：**根据内存大小找到最小块内存。
 
-```c
+```
 index += zend_mm_low_bit(bitmap);
 ```
 
@@ -405,7 +405,7 @@ index += zend_mm_low_bit(bitmap);
 
 zend_mm_low_bit实现如下：
 
-```c
+```
 static inline unsigned int zend_mm_low_bit(size_t _size)
 {
 #if defined(__GNUC__) && (defined(__native_client__) || defined(i386))
@@ -443,7 +443,7 @@ static inline unsigned int zend_mm_low_bit(size_t _size)
 
 zend_mm_high_bit则为large_free_buckets的hash映射函数。
 
-```c
+```
 #define ZEND_MM_LARGE_BUCKET_INDEX(S) zend_mm_high_bit(S)
 
 static inline unsigned int zend_mm_high_bit(size_t _size)
@@ -479,19 +479,19 @@ zend_mm_high_bit是bit scan reverse，也是从低位向高位扫描，但它是
 
 **6：** 如果free_buckets没有找到合适的内存，则进入zend_mm_search_large_block，在large_free_buckets中寻找合适的内存。
 
-```c
+```
 best_fit = zend_mm_search_large_block(heap, true_size);
 ```
 
 **6.1：**使用前面说过的宏ZEND_MM_LARGE_BUCKET_INDEX，来查找true_size对应的large_free_buckets。
 
-```c
+```
 size_t index = ZEND_MM_LARGE_BUCKET_INDEX(true_size);
 ```
 
 **6.2：**和之前小块内存分配的逻辑一样，看看large_free_buckets中剩余的内存是否满足true_size。（将heap->free_bitmap 右移index次，不为0则有空闲内存）
 
-```c
+```
 size_t bitmap = heap->large_free_bitmap >> index;
 
 if (bitmap == 0) {
@@ -501,7 +501,7 @@ if (bitmap == 0) {
 
 **6.3：**看看large_free_buckets[index]是否存在可用的内存。
 
-```c
+```
 if (UNEXPECTED((bitmap & 1) != 0)) {
 }
 ```
@@ -510,7 +510,7 @@ large_free_buckets是一种字典树，如果large_free_buckets[index]中的内�
 
 如果没有找到大小相等的内存，则寻找最小的“大块内存”。
 
-```c
+```
 best_fit = p = heap->large_free_buckets[index + zend_mm_low_bit(bitmap)];
 while ((p = p->child[p->child[0] != NULL])) {
 	if (ZEND_MM_FREE_BLOCK_SIZE(p) < ZEND_MM_FREE_BLOCK_SIZE(best_fit)) {
@@ -523,7 +523,7 @@ while ((p = p->child[p->child[0] != NULL])) {
 
 **7：** 如果free_bucket和large_free_buckets都没有找到合适的内存，那么只好去搜索rest_buckets了。
 
-```c
+```
 if (!best_fit && heap->real_size >= heap->limit - heap->block_size) {
 	zend_mm_free_block *p = heap->rest_buckets[0];
 	size_t best_size = -1;
@@ -531,13 +531,13 @@ if (!best_fit && heap->real_size >= heap->limit - heap->block_size) {
 
 **8：**如果以上都没有合适的内存的话（有可能是初始化的时候，或者内存不足的情况），申请一块段内存。
 
-```c
+```
 segment = (zend_mm_segment *) ZEND_MM_STORAGE_ALLOC(segment_size);
 ```
 
 然后将这块新segment的第一块block作为best_fit使用。
 
-```c
+```
 best_fit = (zend_mm_free_block *) ((char *) segment + ZEND_MM_ALIGNED_SEGMENT_SIZE);
 ZEND_MM_MARK_FIRST_BLOCK(best_fit);
 block_size = segment_size - ZEND_MM_ALIGNED_SEGMENT_SIZE - ZEND_MM_ALIGNED_HEADER_SIZE;
@@ -550,7 +550,7 @@ segment的结构如下图：
 
 **9：**最后，将新的block放入large_free_buckets/free_buckets/rest_buckets。
 
-```c
+```
 zend_mm_free_block *new_free_block;
 
 /* prepare new free block */
@@ -568,7 +568,7 @@ if (EXPECTED(!keep_rest)) {
 
 通过zend_mm_add_to_free_list可以看到large_free_bucket和free_buckets的分配方式。如果new_free_block是大块内存，则将它分配到large_free_buckets。
 
-```c
+```
 index = ZEND_MM_LARGE_BUCKET_INDEX(size); //通过ZEND_MM_LARGE_BUCKET_INDEX定位到size对应的index
 p = &heap->large_free_buckets[index];
 mm_block->child[0] = mm_block->child[1] = NULL; 
@@ -612,7 +612,7 @@ large_free_buckets的结构如下图：
 
 **1：** 如果p是一个合法的指针，计算其对应的block，和block的大小。
 
-```c
+```
 if (!ZEND_MM_VALID_PTR(p)) {
 	return;
 }
@@ -626,7 +626,7 @@ ZEND_MM_CHECK_PROTECTION(mm_block);
 
 **2：**如果size是小块内存且cache未满(最大ZEND_MM_CACHE_SIZE)，计算其对应的index，将mm_block放入cache[index]。（CACHE默认开启，其中ZEND_MM_SMALL_SIZE、ZEND_MM_BUCKET_INDEX在前面分配内存的时候讲过）
 
-```c
+```
 #if ZEND_MM_CACHE
 	if (EXPECTED(ZEND_MM_SMALL_SIZE(size)) && EXPECTED(heap->cached < ZEND_MM_CACHE_SIZE)) {
 		size_t index = ZEND_MM_BUCKET_INDEX(size); 
@@ -646,7 +646,7 @@ ZEND_MM_CHECK_PROTECTION(mm_block);
 
 **3：**如果size是大块内存或者cache已满，且mm_block的前一块或者后一块block是空闲块，则调用zend_mm_remove_from_free_list将其删除（将下一个节点/上一节点合并）。如果mm_block为segment的第一块，则使用zend_mm_del_segment删除这个segment。否则就使用zend_mm_add_to_free_list将mm_block加入large_free_buckets/free_buckets/rest_buckets。
 
-```c
+```
 next_block = ZEND_MM_BLOCK_AT(mm_block, size);
 if (ZEND_MM_IS_FREE_BLOCK(next_block)) {
 	zend_mm_remove_from_free_list(heap, (zend_mm_free_block *) next_block);
