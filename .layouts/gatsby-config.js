@@ -2,10 +2,9 @@ const path = require("path");
 const pathPrefix = "/";
 // Change me
 const siteMetadata = {
-  title: "Foam Template for Gatsby Theme Primer Wiki",
-  shortName: "Wiki",
-  description:
-    "Another Foam template that use gatsby-theme-primer-wiki, Welcome to your new Foam Knowledge Base!",
+  title: "Mars’ Blog",
+  shortName: "记录·分享·回顾",
+  description: "自我提升,效率提升,开源工具,学习笔记,网络安全",
   twitterName: "theowenyoung",
   imageUrl: "/graph-visualisation.jpg",
   siteUrl: "https://demo-foam.owenyoung.com",
