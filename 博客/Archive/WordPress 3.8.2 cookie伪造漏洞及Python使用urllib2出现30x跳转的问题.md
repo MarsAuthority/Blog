@@ -118,6 +118,3 @@ print response.status
 这样，就可以正常返回301/302状态码。
 
 另外，WordPress 3.8.2补丁分析 HMAC timing attack [http://drops.wooyun.org/papers/1404](http://drops.wooyun.org/papers/1404) 思路确实很赞。
-
--   LunaBot
-    
