@@ -215,5 +215,3 @@ Synopsys Software Integrity Group 的高级软件解决方案经理 Mike McGuire
 #### 参考资料
 - https://news.synopsys.com/2023-02-22-Synopsys-Study-Underscores-Need-for-Comprehensive-SBOM-as-Best-Defense-in-Software-Supply-Chain-Security
 - https://www.synopsys.com/software-integrity/resources/analyst-reports/open-source-security-risk-analysis.html?cmp=pr-sig&utm_medium=referral
-
-⌥E

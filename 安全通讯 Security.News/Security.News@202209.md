@@ -201,5 +201,3 @@ Exchange Online 团队本周表示“今天，我们宣布，自 2022 年 10 月
 
 #### 参考资料
 - https://techcommunity.microsoft.com/t5/exchange-team-blog/basic-authentication-deprecation-in-exchange-online-september/ba-p/3609437
-
-⌥E

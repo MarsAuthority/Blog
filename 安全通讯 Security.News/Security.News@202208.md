@@ -108,5 +108,3 @@ Cloudflare使用硬件密钥作为MFA，所以即使有3人被钓鱼也没受影
 #### 参考资料
 - https://krebsonsecurity.com/2018/07/google-security-keys-neutralized-employee-phishing/
 - https://blog.cloudflare.com/2022-07-sms-phishing-attacks/
-
-⌥E

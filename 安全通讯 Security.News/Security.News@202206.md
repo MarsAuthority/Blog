@@ -132,5 +132,3 @@ CSP 将about:blank URL 视为同源（同源策略），当攻击者将跨域 if
 
 #### 参考资料
 - https://chronicle.security/knowledge-base/
-
-⌥E
