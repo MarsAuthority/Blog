@@ -7,7 +7,7 @@ const siteMetadata = {
   description: "自我提升,效率提升,开源工具,学习笔记,网络安全",
   twitterName: "theowenyoung",
   imageUrl: "/graph-visualisation.jpg",
-  siteUrl: "https://test.mars.run",
+  siteUrl: "https://mars.run",
 };
 module.exports = {
   siteMetadata,
