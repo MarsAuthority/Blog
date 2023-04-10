@@ -10,7 +10,7 @@ tags:
   - NSA
   - MITRE
   - netscout
-  - Coinbase遭受钓鱼攻击，但被成功阻止
+  - Coinbase
   - Godaddy
   - Lastpass
   - 开源
