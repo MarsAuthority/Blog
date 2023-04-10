@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://test.mars.run/sitemap/sitemap-index.xml
-Host: https://test.mars.run
+Sitemap: https://mars.run/sitemap/sitemap-index.xml
+Host: https://mars.run
